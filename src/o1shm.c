@@ -1,7 +1,7 @@
 /**
  * BSD 3-Clause License
  *
- * Copyright (c) 2021, Gonzalo Arana
+ * Copyright (c) 2024, Gonzalo Arana
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
