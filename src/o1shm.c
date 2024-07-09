@@ -50,6 +50,7 @@ O1_SHM_STATIC void* shm_alloc(
     char** error_message
 ) {
     void* location = NULL;
+    int read_write = O_RDWR == (open_flags & (O_RDWR | O_RDONLY));
     int fd_ = shm_open(
         name,
         open_flags & (O_CREAT | O_RDWR | O_RDONLY),
@@ -70,8 +71,6 @@ O1_SHM_STATIC void* shm_alloc(
             return SHM_ALLOC_RESIZE_ERROR;
         }
     }
-
-    int read_write = O_RDWR == (open_flags & (O_RDWR | O_RDONLY));
 
     location = mmap(
         NULL,
