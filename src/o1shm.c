@@ -63,11 +63,13 @@ O1_SHM_STATIC void* shm_alloc(
         return SHM_ALLOC_OPEN_ERROR;
     }
 
-    if (ftruncate(fd_, size) < 0) {
-        close(fd_);
-        if (error_message)
-            *error_message = shm_error(SHM_ALLOC_RESIZE_ERROR, name, size);
-        return SHM_ALLOC_RESIZE_ERROR;
+    if (open_flags & O_CREAT) {
+        if (ftruncate(fd_, size) < 0) {
+            close(fd_);
+            if (error_message)
+                *error_message = shm_error(SHM_ALLOC_RESIZE_ERROR, name, size);
+            return SHM_ALLOC_RESIZE_ERROR;
+        }
     }
 
     int read_write = O_RDWR == (open_flags & (O_RDWR | O_RDONLY));
