@@ -90,7 +90,9 @@ O1_SHM_STATIC void* shm_alloc(
 
     *fd = fd_;
 
-    *error_message = NULL;
+    if (error_message)
+        *error_message = NULL;
+
     return location;
 }
 
