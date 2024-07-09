@@ -99,15 +99,21 @@ O1_SHM_STATIC void* shm_alloc(
 char* shm_error(void* result, const char* name, off_t size) {
 
     char* message = NULL;
+    int length = 0;
 
     if (result == SHM_ALLOC_OPEN_ERROR)
-        asprintf(&message, "Could not open %s: %s", name, strerror(errno));
+        length = asprintf(&message, "Could not open %s: %s", name, strerror(errno));
 
     if (result == SHM_ALLOC_RESIZE_ERROR)
-        asprintf(&message, "Could not resize %s to %zu: %s", name, size, strerror(errno));
+        length = asprintf(&message, "Could not resize %s to %zu: %s", name, size, strerror(errno));
 
     if (result == SHM_ALLOC_MAP_ERROR)
-        asprintf(&message, "Could not mmap %s: %s", name, strerror(errno));
+        length = asprintf(&message, "Could not mmap %s: %s", name, strerror(errno));
+
+    if (length < 0) {
+        fputs("Could not allocate error message.", stderr);
+        exit(1);
+    }
 
     return message;
 }
