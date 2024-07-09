@@ -37,7 +37,6 @@
 #include <unistd.h>
 
 #include <sys/mman.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <errno.h>
 
