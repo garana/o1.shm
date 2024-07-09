@@ -1,7 +1,7 @@
 /**
  * BSD 3-Clause License
  *
- * Copyright (c) 2021, Gonzalo Arana
+ * Copyright (c) 2024, Gonzalo Arana
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,6 +60,7 @@
  * @param name specifies the shared memory object to be created or opened
  * @param size if set to non-zero, the memory area will be resized.
  * @param open_flags a combination of: O_CREAT | O_RDWR (or O_RDONLY)
+ * @param error_message if !NULL, the error message is returned here, and should be `free(3)ed`.
  * @return the mapped area, or any of SHM_ALLOC_OPEN_* error status.
  */
 O1_SHM_STATIC
@@ -67,7 +68,17 @@ void* shm_alloc(
     int* fd,
     const char* name,
     off_t size,
-    int open_flags
+    int open_flags,
+    char** error_message
 );
+
+/**
+ * Given a shm_alloc return value, returns the error message associated
+ * with it, or NULL if if does not denote an error.
+ * The returned string is dynamically allocated memory, and should be
+ * `free(3)`ed.
+ */
+O1_SHM_STATIC
+char* shm_error(void* result, const char* name, off_t size);
 
 #endif //O1_SHM_H

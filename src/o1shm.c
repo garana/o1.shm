@@ -31,12 +31,15 @@
  *
  */
 
-
+#define _GNU_SOURCE
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
 
 #include <sys/mman.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <errno.h>
 
 #include "o1shm.h"
 
@@ -44,7 +47,8 @@ O1_SHM_STATIC void* shm_alloc(
     int* fd,
     const char* name,
     off_t size,
-    int open_flags
+    int open_flags,
+    char** error_message
 ) {
     void* location = NULL;
     int fd_ = shm_open(
@@ -53,11 +57,16 @@ O1_SHM_STATIC void* shm_alloc(
         0600
     );
 
-    if (fd_ < 0)
+    if (fd_ < 0) {
+        if (error_message)
+            *error_message = shm_error(SHM_ALLOC_OPEN_ERROR, name, size);
         return SHM_ALLOC_OPEN_ERROR;
+    }
 
     if (ftruncate(fd_, size) < 0) {
         close(fd_);
+        if (error_message)
+            *error_message = shm_error(SHM_ALLOC_RESIZE_ERROR, name, size);
         return SHM_ALLOC_RESIZE_ERROR;
     }
 
@@ -74,9 +83,27 @@ O1_SHM_STATIC void* shm_alloc(
 
     if (!location) {
         close(fd_);
+        if (error_message)
+            *error_message = shm_error(SHM_ALLOC_MAP_ERROR, name, size);
         return SHM_ALLOC_MAP_ERROR;
     }
 
     *fd = fd_;
     return location;
+}
+
+char* shm_error(void* result, const char* name, off_t size) {
+
+    char* message = NULL;
+
+    if (result == SHM_ALLOC_OPEN_ERROR)
+        asprintf(&message, "Could not open %s: %s", name, strerror(errno));
+
+    if (result == SHM_ALLOC_RESIZE_ERROR)
+        asprintf(&message, "Could not resize %s to %zu: %s", name, size, strerror(errno));
+
+    if (result == SHM_ALLOC_MAP_ERROR)
+        asprintf(&message, "Could not mmap %s: %s", name, strerror(errno));
+
+    return message;
 }
