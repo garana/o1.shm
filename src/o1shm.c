@@ -42,13 +42,14 @@
 
 O1_SHM_STATIC void* shm_alloc(
     int* fd,
-    const char* filename,
-    off_t size
+    const char* name,
+    off_t size,
+    int open_flags
 ) {
     void* location = NULL;
     int fd_ = shm_open(
-        filename,
-        O_CREAT | O_RDWR,
+        name,
+        open_flags & (O_CREAT | O_RDWR | O_RDONLY),
         0600
     );
 
@@ -60,10 +61,12 @@ O1_SHM_STATIC void* shm_alloc(
         return SHM_ALLOC_RESIZE_ERROR;
     }
 
+    int read_write = O_RDWR == (open_flags & (O_RDWR | O_RDONLY));
+
     location = mmap(
         NULL,
         size,
-        PROT_READ | PROT_WRITE,
+        PROT_READ | (read_write ? PROT_WRITE : 0),
         MAP_SHARED,
         fd_,
         0
@@ -76,8 +79,4 @@ O1_SHM_STATIC void* shm_alloc(
 
     *fd = fd_;
     return location;
-}
-
-O1_SHM_STATIC int shm_unmap(void* p, off_t size) {
-    return munmap(p, size);
 }

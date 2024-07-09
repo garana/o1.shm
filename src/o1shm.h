@@ -45,8 +45,29 @@
 #define SHM_ALLOC_RESIZE_ERROR   ((void*)-2)
 #define SHM_ALLOC_MAP_ERROR      ((void*)-3)
 
-O1_SHM_STATIC void* shm_alloc(int* fd, const char* filename, off_t size);
-
-O1_SHM_STATIC int shm_unmap(void* p, off_t size);
+/**
+ * Creates a new shared memory area, or attaches to an already existing
+ * one (based on @param name).
+ *
+ * To release the resources:
+ * - shm_unlink(3): will disassociate the name with the mapped area.
+ * - munmap(2): will unmap the area from the current process/thread.
+ * - close(2): will not affect the mapping, can be called right after
+ *             shm_alloc, if we know the area will not need to be
+ *             `ftruncate`d later.
+ *
+ * @param fd out: will be set to the file descriptor. Required to call (close)
+ * @param name specifies the shared memory object to be created or opened
+ * @param size if set to non-zero, the memory area will be resized.
+ * @param open_flags a combination of: O_CREAT | O_RDWR (or O_RDONLY)
+ * @return the mapped area, or any of SHM_ALLOC_OPEN_* error status.
+ */
+O1_SHM_STATIC
+void* shm_alloc(
+    int* fd,
+    const char* name,
+    off_t size,
+    int open_flags
+);
 
 #endif //O1_SHM_H
