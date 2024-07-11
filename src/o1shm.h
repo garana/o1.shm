@@ -41,9 +41,10 @@
 #define O1_SHM_STATIC
 #endif
 
-#define SHM_ALLOC_OPEN_ERROR     ((void*)-1)
-#define SHM_ALLOC_RESIZE_ERROR   ((void*)-2)
-#define SHM_ALLOC_MAP_ERROR      ((void*)-3)
+#define SHM_ALLOC_OK             ( 0)
+#define SHM_ALLOC_OPEN_ERROR     (-1)
+#define SHM_ALLOC_RESIZE_ERROR   (-2)
+#define SHM_ALLOC_MAP_ERROR      (-3)
 
 /**
  * Creates a new shared memory area, or attaches to an already existing
@@ -60,8 +61,8 @@
  * @param name specifies the shared memory object to be created or opened
  * @param size if set to non-zero, the memory area will be resized.
  * @param open_flags a combination of: O_CREAT | O_RDWR (or O_RDONLY)
- * @param error_message if !NULL, the error message is returned here, and should be `free(3)ed`.
- * @return the mapped area, or any of SHM_ALLOC_OPEN_* error status.
+ * @param error if !NULL, the error code (SHM_ALLOC_OPEN_*) is returned here.
+ * @return the mapped area, or NULL in case of errors.
  */
 O1_SHM_STATIC
 void* shm_alloc(
@@ -69,7 +70,7 @@ void* shm_alloc(
     const char* name,
     off_t size,
     int open_flags,
-    char** error_message
+    int* error
 );
 
 /**
@@ -79,6 +80,6 @@ void* shm_alloc(
  * `free(3)`ed.
  */
 O1_SHM_STATIC
-char* shm_error(void* result, const char* name, off_t size);
+char* shm_error(int error, const char* name, off_t size);
 
 #endif //O1_SHM_H
