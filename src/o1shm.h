@@ -61,7 +61,7 @@
  * @param name specifies the shared memory object to be created or opened
  * @param size if set to non-zero, the memory area will be resized.
  * @param open_flags a combination of: O_CREAT | O_RDWR (or O_RDONLY)
- * @param error if !NULL, the error code (SHM_ALLOC_OPEN_*) is returned here.
+ * @param error_code if !NULL, the error code (SHM_ALLOC_OPEN_*) is returned here.
  * @return the mapped area, or NULL in case of errors.
  */
 O1_SHM_STATIC
@@ -70,7 +70,7 @@ void* shm_alloc(
     const char* name,
     off_t size,
     int open_flags,
-    int* error
+    int* error_code
 );
 
 /**
@@ -80,6 +80,6 @@ void* shm_alloc(
  * `free(3)`ed.
  */
 O1_SHM_STATIC
-char* shm_error(int error, const char* name, off_t size);
+char* shm_error(int error_code, const char* name, off_t size);
 
 #endif //O1_SHM_H
